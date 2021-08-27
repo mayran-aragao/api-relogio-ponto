@@ -1,7 +1,8 @@
 const Models = require('../models/User')
 const { Op } = require("sequelize");
 const jwt = require('jsonwebtoken')
-// require('dotenv').config();
+const emailController = require('../controllers/emailController')
+const md5 = require('md5')
 
 module.exports = {
 
@@ -9,63 +10,78 @@ module.exports = {
         try {
             let user = await Models.User.findOne({
                 where: {
-                    matricula: req.body.matricula
+                    [Op.and]: [{ matricula: req.body.matricula }, { email: req.body.email },{valido:true}]
                 }
             })
-            if (user.email != req.body.email) {
-                res.json({ error: "Falha na autenticação" })
-                return
-            }
             if (user) {
-                console.log(process.env.JWT_KEY)
                 const token = jwt.sign({
                     cd_empresa: user.cd_empresa,
                     nome: user.nome,
                     matricula: user.matricula,
-                    email: user.email
+                    email: user.email,
+                    valido: user.valido
                 },
                     process.env.JWT_KEY,
                     {
                         expiresIn: "1h"
                     })
-                res.json({ error: '', token, user })
+                return res.json({ error: '', token, user })
 
             }
+            return res.json({ error: 'Usuário nao cadastrado'})
 
         } catch (e) {
-            res.json({ error: "Impossivel logar! Verifique os dados ou tente novamente mais tarte!" })
+            res.json({ error: "Impossivel logar! Verifique os dados ou tente novamente mais tarte!" + e })
         }
     },
     signup: async (req, res) => {
         try {
-            let verificacao = await Models.User.findOne({
-                where: {
-                    [Op.or]: [{ matricula: req.body.matricula }, { email: req.body.email }]
-                }
-            })
-            if (verificacao) {
-                res.json({ error: "Dados já cadastrado" })
-                return
-            }
+            emailController.verificar_email(req.body.email, async (error, info) => {
+                if (info.success == true) {
 
-            let ver_matricula = await Models.Funcionario.findOne({
-                where: {
-                    matricula: req.body.matricula
+                    let verificacao = await Models.User.findOne({
+                        where: {
+                            [Op.or]: [{ matricula: req.body.matricula }, { email: req.body.email }]
+                        }
+                    })
+
+                    if (verificacao) {
+                        return res.json({ error: "Dados já cadastrado" })
+
+                    }
+
+                    let ver_matricula = await Models.Funcionario.findOne({
+                        where: {
+                            matricula: req.body.matricula
+                        }
+                    })
+
+
+
+                    if (ver_matricula) {
+                        let secret = md5(req.body.matricula + ver_matricula.cd_empresa)
+                        emailController.send_email(req.body.email, secret)
+                        let user = await Models.User.create({
+                            nome: (ver_matricula.nome).trim(),
+                            matricula: req.body.matricula,
+                            cd_empresa: ver_matricula.cd_empresa,
+                            email: req.body.email,
+                            valido: false,
+                            hash: secret,
+                        })
+
+                        return res.json({ error: '', success: 'Enviamos uma confirmação para o e-mail!' })
+
+                    }
+                    return res.json({ error: 'Matricula não encontrada' })
+
                 }
+                return res.json({ error: 'E-mail invalido' })
+
             })
-            if (ver_matricula) {
-                let user = await Models.User.create({
-                    nome:(ver_matricula.nome).trim(),
-                    matricula: req.body.matricula,
-                    cd_empresa:ver_matricula.cd_empresa,
-                    email:req.body.email,
-                })
-                res.json({ error: '', success:'Enviamos uma confirmação para o e-mail!'})
-            }
-            res.json({ error: 'matricula nao encontrada' })
 
         } catch (e) {
-            console.log({ error: "Impossivel cadastrar! Verifique os dados ou tente novamente mais tarte!" })
+            return res.json({ error: "Impossivel cadastrar! Verifique os dados ou tente novamente mais tarte! " + e })
         }
     }
 }

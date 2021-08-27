@@ -15,6 +15,14 @@ const User = sequelize.define('funcionario_app',{
     email:
      {
          type: DataTypes.STRING,
+     },
+     valido:
+     {
+         type: DataTypes.BOOLEAN,
+     },
+     hash:
+     {
+         type: DataTypes.STRING
      }
 },{
     timestamps:false,

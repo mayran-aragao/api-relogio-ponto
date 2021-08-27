@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirmação de recebimento</title>    
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">    
+
+    <!-- JQuery Confirm-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-roadmap@1.4.0/dist/jquery.roadmap.min.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+   
+    
+</head>
+<body style="background-color: #fff;">
+    <header>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb text-center" style="background-color: #191970;padding: 1.75rem 1rem;">
+                <li class="breadcrumb-item active" aria-current="page" style="color: #ffff; font-weight: bold">Confirmação de recebimento</li>
+            </ol>
+          </nav>
+    </header>
+    <div id="container_confirmacao" class="container-fluid" >
+        <div class="card text-center">
+            <div class="card-header">
+                Bem-vindo ao closed beta!
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Obrigado por participar</h5>
+                <p class="card-text" style="font-color: #00FF7F">E-mail confirmado com sucesso!!!</p>
+                {{! <a href="#" class="btn btn-primary">Go somewhere</a> }}
+            </div>
+            
+        </div>
+    </div>
+     
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js'></script>
+
+    <!-- JQuery confirm-->    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+
+
+</body>
+</html>
