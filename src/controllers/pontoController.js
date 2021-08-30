@@ -17,17 +17,22 @@ module.exports = {
     },
     buscar_periodo: async (req,res,next) => {
         try {
+            console.log("entrou aqui no controler do ponto")
             let pontos = await Ponto.findAll({
                 where: {
                     matricula:req.body.matricula,
                     dt_ponto:{
-                        [Op.between]:[req.body.dt_ponto_inicio,req.body.dt_ponto_fim]
+                        [Op.between]:[req.body.startDate,req.body.endDate]
                     }
                 }
             })
-            res.json({error:'',pontos})
+            if(pontos.length > 0){
+               return res.json({error:'',pontos})
+            }
+            return res.json({error:'Nenhum registro encontrado!'})
+
         }catch(e) {
-            console.log({error:"Aconteceu um erro ao buscar ponto"})
+            return res.json({error:"Registro não encontrado"})
         }
     },
     registrar: async (req,res) => {
