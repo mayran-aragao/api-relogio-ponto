@@ -1,4 +1,5 @@
 const Models = require('../models/User')
+const Loja = require('../models/Loja')
 const { Op } = require("sequelize");
 const jwt = require('jsonwebtoken')
 const emailController = require('../controllers/emailController')
@@ -14,18 +15,19 @@ module.exports = {
                 }
             })
             if (user) {
+                
                 const token = jwt.sign({
                     cd_empresa: user.cd_empresa,
                     nome: user.nome,
                     matricula: user.matricula,
                     email: user.email,
-                    valido: user.valido
+                    valido: user.valido,
                 },
                     process.env.JWT_KEY,
                     {
                         expiresIn: "24h"
                     })
-                return res.json({ error: '', token, user })
+                return res.json({ error: '', token, user  })
 
             }
             return res.json({ error: 'Usuário nao cadastrado'})
@@ -56,11 +58,14 @@ module.exports = {
                         }
                     })
 
-
-
                     if (ver_matricula) {
                         let secret = md5(req.body.matricula + ver_matricula.cd_empresa)
                         emailController.send_email(req.body.email, secret)
+                        let loja = await Loja.findOne({
+                            where:{
+                                sg_loja: ver_matricula.cd_empresa
+                            }
+                        })
                         let user = await Models.User.create({
                             nome: (ver_matricula.nome).trim(),
                             matricula: req.body.matricula,
@@ -68,6 +73,8 @@ module.exports = {
                             email: req.body.email,
                             valido: false,
                             hash: secret,
+                            nr_pis: ver_matricula.nr_pis,
+                            cnpj: loja.nr_cgc
                         })
 
                         return res.json({ error: '', success: 'Enviamos uma confirmação para o e-mail!' })

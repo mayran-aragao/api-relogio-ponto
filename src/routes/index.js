@@ -13,10 +13,10 @@ router.post('/signup', UserController.signup);
 
 router.post('/validar', AuthController.validar);
 
-router.post('/buscar_ponto', Auth.private, PontoController.buscar_ponto);
 router.post('/buscar_periodo', Auth.private, PontoController.buscar_periodo)
+router.post('/buscar_nsr', Auth.private, PontoController.buscar_nsr)
 
-router.post('/salvar_ponto', PontoController.registrar)
+router.post('/salvar_ponto', Auth.private, PontoController.salvar_ponto)
 
 router.get('/auth/:hash',ConfirmacaoController.home)
 

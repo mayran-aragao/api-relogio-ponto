@@ -23,6 +23,12 @@ const User = sequelize.define('funcionario_app',{
      hash:
      {
          type: DataTypes.STRING
+     },
+     nr_pis:{
+         type: DataTypes.STRING
+     },
+     cnpj:{
+         type: DataTypes.STRING
      }
 },{
     timestamps:false,
@@ -39,6 +45,9 @@ const Funcionario = sequelize.define('funcionario',{
     },
     cd_empresa: {
         type: DataTypes.STRING,
+    },
+    nr_pis:{
+        type: DataTypes.STRING
     }
     
 },{
