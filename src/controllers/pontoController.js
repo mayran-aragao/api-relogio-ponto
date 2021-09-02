@@ -13,7 +13,7 @@ module.exports = {
                 }
             })
             if (pontos.length > 0) {
-                return res.json({ error: '', pontos })
+                return res.json( pontos )
             }
             return res.json({ error: 'Nenhum registro encontrado!' })
 
@@ -49,7 +49,8 @@ module.exports = {
                 dt_ponto: req.body.dt_ponto,
                 hr_ponto: req.body.hr_ponto,
                 nsr: req.body.nsr,
-                nr_pis: req.body.nr_pis
+                nr_pis: req.body.nr_pis,
+                localizacao: req.body.location
             })
             if (ponto)
                 return res.json({ error: '', success: 'Ponto registrado com sucesso', ponto })

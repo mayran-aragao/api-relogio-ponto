@@ -29,6 +29,9 @@ const Ponto = sequelize.define('pontorep',{
     },
     nr_pis:{
         type: DataTypes.STRING
+    },
+    localizacao:{
+        type: DataTypes.JSON
     }
 
 },{
