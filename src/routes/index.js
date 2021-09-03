@@ -10,6 +10,8 @@ const Auth = require('../middleware/Auth')
 
 router.post('/signin', UserController.signin);
 router.post('/signup', UserController.signup);
+router.post('/add_photo',Auth.private, UserController.add_photo);
+router.post('/take_photo',Auth.private, UserController.take_photo);
 
 router.post('/validar', AuthController.validar);
 

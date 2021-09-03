@@ -4,15 +4,16 @@ const express = require('express')
 const mustache = require('mustache-express');
 const pg = require('pg')
 const cors = require('cors')
-const Routes = require('./routes/index')
+const Routes = require('./routes/index');
+const bodyParser = require('body-parser');
 
 
 
 const server = express()
 
 server.use(cors())
-server.use(express.json())
-server.use(express.urlencoded({extended:true}))
+server.use(express.json({limit: '5mb'}))
+server.use(express.urlencoded({extended:true,limit: '5mb'}))
 
 server.use('/',Routes);
 

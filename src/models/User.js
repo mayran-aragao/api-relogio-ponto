@@ -29,6 +29,9 @@ const User = sequelize.define('funcionario_app',{
      },
      cnpj:{
          type: DataTypes.STRING
+     },
+     foto:{
+         type: DataTypes.JSON
      }
 },{
     timestamps:false,

@@ -11,11 +11,11 @@ module.exports = {
         try {
             let user = await Models.User.findOne({
                 where: {
-                    [Op.and]: [{ matricula: req.body.matricula }, { email: req.body.email },{valido:true}]
+                    [Op.and]: [{ matricula: req.body.matricula }, { email: req.body.email }, { valido: true }]
                 }
             })
             if (user) {
-                
+
                 const token = jwt.sign({
                     cd_empresa: user.cd_empresa,
                     nome: user.nome,
@@ -27,10 +27,10 @@ module.exports = {
                     {
                         expiresIn: "24h"
                     })
-                return res.json({ error: '', token, user  })
+                return res.json({ error: '', token, user })
 
             }
-            return res.json({ error: 'Usuário nao cadastrado'})
+            return res.json({ error: 'Usuário nao cadastrado' })
 
         } catch (e) {
             res.json({ error: "Impossivel logar! Verifique os dados ou tente novamente mais tarte!" + e })
@@ -62,7 +62,7 @@ module.exports = {
                         let secret = md5(req.body.matricula + ver_matricula.cd_empresa)
                         emailController.send_email(req.body.email, secret)
                         let loja = await Loja.findOne({
-                            where:{
+                            where: {
                                 sg_loja: ver_matricula.cd_empresa
                             }
                         })
@@ -89,6 +89,40 @@ module.exports = {
 
         } catch (e) {
             return res.json({ error: "Impossivel cadastrar! Verifique os dados ou tente novamente mais tarte! " + e })
+        }
+    },
+    add_photo: async (req, res) => {
+        try {
+            let user = await Models.User.findOne({
+                where: {
+                    matricula: req.body.matricula
+                }
+            })
+            if (user) {
+                user.foto = req.body.photo
+                await user.save()
+                return res.json({error:'',success:'Imagem salva com sucesso!'})
+            }
+            return res.json({error:'Erro ao salvar imagem'})
+
+        } catch (e) {
+            return res.json({error:"Erro ao salvar imagem! "+ e})
+        }
+    },
+    take_photo: async (req, res) => {
+        try {
+            let user = await Models.User.findOne({
+                where: {
+                    matricula: req.body.matricula
+                }
+            })
+            if (user.foto) {
+                return res.json(user.foto)
+            }
+            return res.json({error:'Erro ao buscar imagem'})
+
+        } catch (e) {
+            return res.json({error:'Erro ao buscar imagem! '+ e})
         }
     }
 }
