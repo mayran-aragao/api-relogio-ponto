@@ -39,7 +39,6 @@ module.exports = {
     },
     salvar_ponto: async (req, res) => {
         try {
-            console.log(req.body.cd_chave)
             let ponto = await Ponto.create({
                 cd_chave: req.body.cd_chave,
                 cd_empresa: req.body.cd_empresa,

@@ -51,6 +51,9 @@ const Funcionario = sequelize.define('funcionario',{
     },
     nr_pis:{
         type: DataTypes.STRING
+    },
+    dt_demissao:{
+        type:DataTypes.DATE
     }
     
 },{

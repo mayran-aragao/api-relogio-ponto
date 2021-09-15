@@ -9,6 +9,15 @@ module.exports = {
 
     signin: async (req, res) => {
         try {
+            let verify = await Models.Funcionario.findOne({
+                where:{
+                    [Op.and]: [{matricula: req.body.matricula}, {dt_demissao: null}]
+                }
+            })
+            if(!verify){
+                return res.json({error:'Usuário não permitido'})
+            }
+
             let user = await Models.User.findOne({
                 where: {
                     [Op.and]: [{ matricula: req.body.matricula }, { email: req.body.email }, { valido: true }]
@@ -54,7 +63,7 @@ module.exports = {
 
                     let ver_matricula = await Models.Funcionario.findOne({
                         where: {
-                            matricula: req.body.matricula
+                            [Op.and]: [{matricula: req.body.matricula}, {dt_demissao: null}]
                         }
                     })
 

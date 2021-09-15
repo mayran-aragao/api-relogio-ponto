@@ -12,6 +12,6 @@ require('dotenv').config();
 //     }
 
 // );
-const sequelize = new Sequelize('postgres://usr_aplicacao:aplicacao@172.16.2.222:9001/dbatdc')
+const sequelize = new Sequelize(process.env.PG_LINK)
 
 module.exports = sequelize
