@@ -83,7 +83,8 @@ module.exports = {
                             valido: false,
                             hash: secret,
                             nr_pis: ver_matricula.nr_pis,
-                            cnpj: loja.nr_cgc
+                            cnpj: loja.nr_cgc,
+                            no_funcao:ver_matricula.no_funcao
                         })
 
                         return res.json({ error: '', success: 'Enviamos uma confirmação para o e-mail!' })

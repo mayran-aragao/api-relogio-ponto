@@ -32,7 +32,10 @@ const User = sequelize.define('funcionario_app',{
      },
      foto:{
          type: DataTypes.JSON
-     }
+     },
+     no_funcao:{
+        type:DataTypes.STRING
+    }
 },{
     timestamps:false,
     tableName:"funcionario_app"
@@ -54,6 +57,9 @@ const Funcionario = sequelize.define('funcionario',{
     },
     dt_demissao:{
         type:DataTypes.DATE
+    },
+    no_funcao:{
+        type:DataTypes.STRING
     }
     
 },{
