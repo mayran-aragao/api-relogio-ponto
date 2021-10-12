@@ -8,6 +8,8 @@ const ConfirmacaoController = require('../controllers/confirmacaoController')
 const AuthController =  require ('../controllers/authController')
 const Auth = require('../middleware/Auth')
 
+router.post('/login', UserController.login);
+
 router.post('/signin', UserController.signin);
 router.post('/signup', UserController.signup);
 router.post('/add_photo',Auth.private, UserController.add_photo);

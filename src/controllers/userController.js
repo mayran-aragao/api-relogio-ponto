@@ -1,21 +1,67 @@
 const Models = require('../models/User')
 const Loja = require('../models/Loja')
+const { UserDash, ClassesUser, LojasUser } = require('../models/UserDash')
 const { Op } = require("sequelize");
 const jwt = require('jsonwebtoken')
 const emailController = require('../controllers/emailController')
 const md5 = require('md5')
+const crypt = require("unix-crypt-td-js");
 
 module.exports = {
+    login: async (req, res) => {
+        try {
+            const password = req.body.password
+            const pwd = ["ZXC", "QWE", "YTR", "PLM", "VGK", "XKI", "EFH", "TYK", "RFS", "LWM"].map(a => crypt(`${String(password).toUpperCase()}\n`, a));
 
+            const user_res = await UserDash.findOne({
+                where: {
+                    no_codigo: {
+                        [Op.in]: pwd
+                    }
+                }
+            })
+            if (!user_res) {
+                return res.json({ error: "Usuário nao cadastrado" })
+            }
+            const { no_usuariored: nome, cd_idreg, cd_matricula } = user_res;
+
+            const classes = await ClassesUser.findAll({
+                where: {
+                    cd_idreg
+                }
+            });
+            const lojas = await LojasUser.findAll({
+                where: {
+                    cd_idreg
+                }
+            })
+            const setor = await Models.Funcionario.findOne({
+                where: {
+                    matricula:cd_matricula
+                }
+            })
+            const classes_user = classes.map(a => a.cd_classe);
+            const lojas_user = lojas.map(a => a.sg_loja)
+
+            let user = { nome: nome.trim(), cd_idreg, no_setor: setor.no_setor.trim() };
+
+            const token = jwt.sign({ nome, cd_idreg, lojas: lojas_user, classes: classes_user }, process.env.JWT_KEY, { expiresIn: "1h" });
+
+            return res.json({ error: '', token, user });
+        } catch (e) {
+            return res.json({ error: e })
+        }
+
+    },
     signin: async (req, res) => {
         try {
             let verify = await Models.Funcionario.findOne({
-                where:{
-                    [Op.and]: [{matricula: req.body.matricula}, {dt_demissao: null}]
+                where: {
+                    [Op.and]: [{ matricula: req.body.matricula }, { dt_demissao: null }]
                 }
             })
-            if(!verify){
-                return res.json({error:'Usuário não permitido'})
+            if (!verify) {
+                return res.json({ error: 'Usuário não permitido' })
             }
 
             let user = await Models.User.findOne({
@@ -63,7 +109,7 @@ module.exports = {
 
                     let ver_matricula = await Models.Funcionario.findOne({
                         where: {
-                            [Op.and]: [{matricula: req.body.matricula}, {dt_demissao: null}]
+                            [Op.and]: [{ matricula: req.body.matricula }, { dt_demissao: null }]
                         }
                     })
 
@@ -84,7 +130,7 @@ module.exports = {
                             hash: secret,
                             nr_pis: ver_matricula.nr_pis,
                             cnpj: loja.nr_cgc,
-                            no_funcao:ver_matricula.no_funcao
+                            no_funcao: ver_matricula.no_funcao
                         })
 
                         return res.json({ error: '', success: 'Enviamos uma confirmação para o e-mail!' })
@@ -111,12 +157,12 @@ module.exports = {
             if (user) {
                 user.foto = req.body.photo
                 await user.save()
-                return res.json({error:'',success:'Imagem salva com sucesso!'})
+                return res.json({ error: '', success: 'Imagem salva com sucesso!' })
             }
-            return res.json({error:'Erro ao salvar imagem'})
+            return res.json({ error: 'Erro ao salvar imagem' })
 
         } catch (e) {
-            return res.json({error:"Erro ao salvar imagem! "+ e})
+            return res.json({ error: "Erro ao salvar imagem! " + e })
         }
     },
     take_photo: async (req, res) => {
@@ -129,10 +175,10 @@ module.exports = {
             if (user.foto) {
                 return res.json(user.foto)
             }
-            return res.json({error:'Erro ao buscar imagem'})
+            return res.json({ error: 'Erro ao buscar imagem' })
 
         } catch (e) {
-            return res.json({error:'Erro ao buscar imagem! '+ e})
+            return res.json({ error: 'Erro ao buscar imagem! ' + e })
         }
     }
 }
