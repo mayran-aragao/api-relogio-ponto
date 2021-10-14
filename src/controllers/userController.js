@@ -23,7 +23,7 @@ module.exports = {
             if (!user_res) {
                 return res.json({ error: "Usuário nao cadastrado" })
             }
-            const { no_usuariored: nome, cd_idreg, cd_matricula } = user_res;
+            const { no_usuariored: nome, cd_idreg, cd_matricula, cd_setor } = user_res;
 
             const classes = await ClassesUser.findAll({
                 where: {
@@ -43,7 +43,7 @@ module.exports = {
             const classes_user = classes.map(a => a.cd_classe);
             const lojas_user = lojas.map(a => a.sg_loja)
 
-            let user = { nome: nome.trim(), cd_idreg, no_setor: setor.no_setor.trim() };
+            let user = { nome: nome.trim(), cd_idreg, no_setor: setor.no_setor.trim(), matricula: cd_matricula, cd_setor:setor.cd_setor };
 
             const token = jwt.sign({ nome, cd_idreg, lojas: lojas_user, classes: classes_user }, process.env.JWT_KEY, { expiresIn: "1h" });
 
@@ -180,5 +180,42 @@ module.exports = {
         } catch (e) {
             return res.json({ error: 'Erro ao buscar imagem! ' + e })
         }
-    }
+    },
+    buscar_funcionarios: async (req, res, next) => {
+        try {
+
+            let cd_setor = req.body.setor
+            let ress = await Models.Funcionario.findAll({
+                where: {
+                    [Op.and]:[{cd_setor},{dt_demissao: null}]
+                }
+            })
+
+            let matriculas = ress.map(a => a.matricula)
+            console.log(matriculas)
+
+            let res_funci = await Models.Funcionario.findAll({
+                where: {
+                    [Op.and]:[{cd_setor},{dt_demissao: null}]
+                },
+                include:[{
+                    model:Models.User,
+                    where:{
+                        matricula: {
+                            [Op.in]:matriculas
+                        }
+                    }
+                }]
+            })
+            console.log('resposta', res_funci)
+            return res.json(res_funci)
+            if (res_funci.length > 0) {
+                return res.json(res_funci)
+            }
+            return res.json({ error: 'Nenhum funcionário encontrado!' })
+
+        } catch (e) {
+            return res.json({ error: "error" + e})
+        }
+    },
 }

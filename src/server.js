@@ -2,10 +2,8 @@ require('dotenv').config();
 
 const express = require('express')
 const mustache = require('mustache-express');
-const pg = require('pg')
 const cors = require('cors')
 const Routes = require('./routes/index');
-const bodyParser = require('body-parser');
 
 
 

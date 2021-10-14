@@ -17,7 +17,7 @@ const UserDash = sequelize.define('identifica', {
     },
     sg_loja:{
         type: DataTypes.STRING,
-    }
+    },
 }, {
     timestamps: false,
     tableName: "identifica"

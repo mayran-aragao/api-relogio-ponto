@@ -14,9 +14,11 @@ router.post('/signin', UserController.signin);
 router.post('/signup', UserController.signup);
 router.post('/add_photo',Auth.private, UserController.add_photo);
 router.post('/take_photo',Auth.private, UserController.take_photo);
+router.post('/buscar_funcionarios', UserController.buscar_funcionarios)
 
 router.post('/validar', AuthController.validar);
 
+router.post('/buscar_todos', Auth.private, PontoController.buscar_todos)
 router.post('/buscar_periodo', Auth.private, PontoController.buscar_periodo)
 router.post('/buscar_nsr', Auth.private, PontoController.buscar_nsr)
 

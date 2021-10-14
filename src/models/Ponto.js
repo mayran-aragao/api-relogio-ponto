@@ -1,7 +1,8 @@
 const { Sequelize, DataTypes } = require('sequelize');
+const { Funcionario } = require('../models/User')
 const sequelize = require('../instances/pg')
 
-const Ponto = sequelize.define('pontorep',{
+const Ponto = sequelize.define('pontorep', {
     cd_chave: {
         type: DataTypes.STRING,
         primaryKey: true
@@ -16,7 +17,8 @@ const Ponto = sequelize.define('pontorep',{
         type: DataTypes.STRING
     },
     matricula: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        
     },
     dt_ponto: {
         type: DataTypes.DATE
@@ -24,20 +26,23 @@ const Ponto = sequelize.define('pontorep',{
     hr_ponto: {
         type: DataTypes.STRING
     },
-    nsr:{
+    nsr: {
         type: DataTypes.STRING
     },
-    nr_pis:{
+    nr_pis: {
         type: DataTypes.STRING
     },
-    localizacao:{
+    localizacao: {
         type: DataTypes.JSON
     }
 
-},{
-    timestamps:false,
-    tableName:"pontorep"
-}
-)
+}, {
+    timestamps: false,
+    tableName: "pontorep",
+    schema:'srep'
+})
+
+
+
 
 module.exports = Ponto;

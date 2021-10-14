@@ -1,7 +1,49 @@
 const Ponto = require('../models/Ponto')
+const Models = require('../models/User')
 const { Op } = require("sequelize");
 
 module.exports = {
+    buscar_todos: async (req, res, next) => {
+        try {
+
+            let cd_setor = req.body.setor
+            let res_funci = await Models.Funcionario.findAll({
+                where: {
+                    [Op.and]:[{cd_setor},{dt_demissao: null}]
+                }
+            })
+            let funcionarios = res_funci.map(a => a.matricula)
+            let matriculas = funcionarios
+            funcionarios = funcionarios.map(a => {
+                a = ("00000000000000000" + a).slice(-17)
+                return a
+            })
+
+            let registros = await Ponto.findAll({
+                where: {
+                    nr_rep: {
+                        [Op.in]: funcionarios
+                    }
+                },
+                include:[{
+                    model:Models.Funcionario,
+                    where:{
+                        matricula:{
+                            [Op.in]: matriculas
+                        }
+                    }
+                }]
+            })
+
+            if (registros.length > 0) {
+                return res.json(registros)
+            }
+            return res.json({ error: 'Nenhum registro encontrado!' })
+
+        } catch (e) {
+            return res.json({ error: "Registro não encontrado" })
+        }
+    },
     buscar_periodo: async (req, res, next) => {
         try {
             let pontos = await Ponto.findAll({
@@ -13,7 +55,7 @@ module.exports = {
                 }
             })
             if (pontos.length > 0) {
-                return res.json( pontos )
+                return res.json(pontos)
             }
             return res.json({ error: 'Nenhum registro encontrado!' })
 

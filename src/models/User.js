@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../instances/pg')
+const sequelize = require('../instances/pg');
+const Ponto = require('./Ponto')
 
 const User = sequelize.define('funcionario_app', {
     matricula: {
@@ -38,7 +39,8 @@ const User = sequelize.define('funcionario_app', {
     }
 }, {
     timestamps: false,
-    tableName: "funcionario_app"
+    tableName: "funcionario_app",
+    schema:'srep'
 })
 
 const Funcionario = sequelize.define('funcionario', {
@@ -62,15 +64,35 @@ const Funcionario = sequelize.define('funcionario', {
         type: DataTypes.STRING
     },
     no_setor: {
+        type: DataTypes.STRING,
+        trim: true
+    },
+    cd_setor: {
         type: DataTypes.STRING
     }
 
 }, {
     timestamps: false,
-    tableName: "funcionario"
+    tableName: "funcionario",
+    schema:'srep'
 })
 
 
+Ponto.sync()
+Ponto.belongsTo(Funcionario, {
+    foreignKey: {
+        name: 'matricula',
+    },
+    targetKey:'matricula'
+})
+
+Funcionario.sync()
+Funcionario.hasOne(User,{
+    foreignKey: {
+        name: 'matricula',
+    },
+    targetKey:'matricula'
+})
 
 
 module.exports = { User, Funcionario };

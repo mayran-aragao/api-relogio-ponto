@@ -1,0 +1,23 @@
+{
+    "development": {
+      "username": "usr_aplicacao",
+      "password": "aplicacao",
+      "database": "dbatdc",
+      "host": "172.16.2.222:9900",
+      "dialect": "postgres"
+    },
+    "test": {
+      "username": "root",
+      "password": null,
+      "database": "database_test",
+      "host": "127.0.0.1",
+      "dialect": "mysql"
+    },
+    "production": {
+      "username": "root",
+      "password": null,
+      "database": "database_production",
+      "host": "127.0.0.1",
+      "dialect": "mysql"
+    }
+  }
