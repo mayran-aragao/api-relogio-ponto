@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken')
 const emailController = require('../controllers/emailController')
 const md5 = require('md5')
 const crypt = require("unix-crypt-td-js");
+const { json } = require('body-parser');
 
 module.exports = {
     login: async (req, res) => {
@@ -37,13 +38,13 @@ module.exports = {
             })
             const setor = await Models.Funcionario.findOne({
                 where: {
-                    matricula:cd_matricula
+                    matricula: cd_matricula
                 }
             })
             const classes_user = classes.map(a => a.cd_classe);
             const lojas_user = lojas.map(a => a.sg_loja)
 
-            let user = { nome: nome.trim(), cd_idreg, no_setor: setor.no_setor.trim(), matricula: cd_matricula, cd_setor:setor.cd_setor };
+            let user = { nome: nome.trim(), cd_idreg, no_setor: setor.no_setor.trim(), matricula: cd_matricula, cd_setor: setor.cd_setor };
 
             const token = jwt.sign({ nome, cd_idreg, lojas: lojas_user, classes: classes_user }, process.env.JWT_KEY, { expiresIn: "1h" });
 
@@ -187,35 +188,93 @@ module.exports = {
             let cd_setor = req.body.setor
             let ress = await Models.Funcionario.findAll({
                 where: {
-                    [Op.and]:[{cd_setor},{dt_demissao: null}]
+                    [Op.and]: [{ cd_setor }, { dt_demissao: null }]
                 }
             })
 
             let matriculas = ress.map(a => a.matricula)
-            console.log(matriculas)
 
             let res_funci = await Models.Funcionario.findAll({
                 where: {
-                    [Op.and]:[{cd_setor},{dt_demissao: null}]
+                    [Op.and]: [{ cd_setor }, { dt_demissao: null }]
                 },
-                include:[{
-                    model:Models.User,
-                    where:{
-                        matricula: {
-                            [Op.in]:matriculas
-                        }
-                    }
+                include: [{
+                    model: Models.User,
+                    // where:{
+                    //     matricula: {
+                    //         [Op.in]:matriculas
+                    //     }
+                    // }
                 }]
             })
-            console.log('resposta', res_funci)
-            return res.json(res_funci)
             if (res_funci.length > 0) {
                 return res.json(res_funci)
             }
             return res.json({ error: 'Nenhum funcionário encontrado!' })
 
         } catch (e) {
-            return res.json({ error: "error" + e})
+            return res.json({ error: "error" + e })
         }
     },
+    save_location: async (req, res, next) => {
+        try {
+            let matriculas = req.body.matriculas
+            let coordenadas = req.body.coordenadas
+            // return console.log(matriculas,coordenadas)
+            console.log('matriculas aqui,', matriculas)
+            console.log('cordenadas aqui,', coordenadas)
+            
+            let user = await Models.User.findAll({
+                where: {
+                    matricula: {
+                        [Op.in]:matriculas
+                    }
+                }
+            })
+            user.map(a=>a.local_permitido = coordenadas)
+            await user.map(a => a.save())
+            return res.json({success:'Localização salva'})
+
+        } catch (e) {
+            return res.json({ error: "Erro " + e })
+        }
+    },
+    bloquear: async (req, res, next) => {
+        try {
+            let matriculas = req.body.matriculas
+            
+            let user = await Models.User.findAll({
+                where: {
+                    matricula: {
+                        [Op.in]:matriculas
+                    }
+                }
+            })
+            user.map(a=>a.valido = false)
+            await user.map(a => a.save())
+            return res.json({success:'Bloqueado com sucesso'})
+
+        } catch (e) {
+            return res.json({ error: "Erro " + e })
+        }
+    },
+    liberar: async (req, res, next) => {
+        try {
+            let matriculas = req.body.matriculas
+            
+            let user = await Models.User.findAll({
+                where: {
+                    matricula: {
+                        [Op.in]:matriculas
+                    }
+                }
+            })
+            user.map(a=>a.valido = true)
+            await user.map(a => a.save())
+            return res.json({success:'Liberado com sucesso'})
+
+        } catch (e) {
+            return res.json({ error: "Erro " + e })
+        }
+    }
 }

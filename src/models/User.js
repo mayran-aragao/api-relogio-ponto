@@ -36,6 +36,9 @@ const User = sequelize.define('funcionario_app', {
     },
     no_funcao: {
         type: DataTypes.STRING
+    },
+    local_permitido: {
+        type: DataTypes.JSON
     }
 }, {
     timestamps: false,

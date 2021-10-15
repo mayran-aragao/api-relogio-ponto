@@ -14,7 +14,10 @@ router.post('/signin', UserController.signin);
 router.post('/signup', UserController.signup);
 router.post('/add_photo',Auth.private, UserController.add_photo);
 router.post('/take_photo',Auth.private, UserController.take_photo);
-router.post('/buscar_funcionarios', UserController.buscar_funcionarios)
+router.post('/salvar_localizacao',Auth.private, UserController.save_location);
+router.post('/bloquear',Auth.private, UserController.bloquear);
+router.post('/liberar',Auth.private, UserController.liberar);
+router.post('/buscar_funcionarios', Auth.private, UserController.buscar_funcionarios)
 
 router.post('/validar', AuthController.validar);
 
