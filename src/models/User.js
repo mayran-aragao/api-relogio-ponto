@@ -19,7 +19,7 @@ const User = sequelize.define('funcionario_app', {
     },
     valido:
     {
-        type: DataTypes.BOOLEAN,
+        type: DataTypes.INTEGER,
     },
     hash:
     {

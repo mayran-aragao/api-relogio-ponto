@@ -22,7 +22,7 @@ module.exports = {
                 }
             })
             if (!user_res) {
-                return res.json({ error: "Usuário nao cadastrado" })
+                return res.json({ error: "Usuário não cadastrado" })
             }
             const { no_usuariored: nome, cd_idreg, cd_matricula, cd_setor } = user_res;
 
@@ -67,7 +67,7 @@ module.exports = {
 
             let user = await Models.User.findOne({
                 where: {
-                    [Op.and]: [{ matricula: req.body.matricula }, { email: req.body.email }, { valido: true }]
+                    [Op.and]: [{ matricula: req.body.matricula }, { email: req.body.email }, { valido: 1 }]
                 }
             })
             if (user) {
@@ -127,7 +127,7 @@ module.exports = {
                             matricula: req.body.matricula,
                             cd_empresa: ver_matricula.cd_empresa,
                             email: req.body.email,
-                            valido: false,
+                            valido: 3,
                             hash: secret,
                             nr_pis: ver_matricula.nr_pis,
                             cnpj: loja.nr_cgc,
@@ -220,9 +220,6 @@ module.exports = {
         try {
             let matriculas = req.body.matriculas
             let coordenadas = req.body.coordenadas
-            // return console.log(matriculas,coordenadas)
-            console.log('matriculas aqui,', matriculas)
-            console.log('cordenadas aqui,', coordenadas)
             
             let user = await Models.User.findAll({
                 where: {
@@ -250,7 +247,10 @@ module.exports = {
                     }
                 }
             })
-            user.map(a=>a.valido = false)
+            if (user.length < matriculas.length) {
+                return res.json({error:'Usuário inativo selecionado'})
+            }
+            user.map(a=>a.valido = 2)
             await user.map(a => a.save())
             return res.json({success:'Bloqueado com sucesso'})
 
@@ -269,7 +269,10 @@ module.exports = {
                     }
                 }
             })
-            user.map(a=>a.valido = true)
+            if (user.length < matriculas.length) {
+                return res.json({error:'Usuário inativo selecionado'})
+            }
+            user.map(a=>a.valido = 1)
             await user.map(a => a.save())
             return res.json({success:'Liberado com sucesso'})
 

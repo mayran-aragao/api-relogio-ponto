@@ -9,7 +9,7 @@ module.exports = {
             res.json({error:"",user: decode})
 
         } catch (e){
-            res.json({error:"Falha na autenticação"})
+            res.json({ error: "Falha na autenticação", codigo:403 })
         }
     }
 }
