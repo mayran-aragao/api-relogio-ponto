@@ -39,7 +39,13 @@ const User = sequelize.define('funcionario_app', {
     },
     local_permitido: {
         type: DataTypes.JSON
-    }
+    },
+    init_date: {
+        type: DataTypes.DATE
+    },
+    end_date: {
+        type: DataTypes.DATE
+    },
 }, {
     timestamps: false,
     tableName: "funcionario_app",

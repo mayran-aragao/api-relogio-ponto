@@ -4,9 +4,10 @@ const { UserDash, ClassesUser, LojasUser } = require('../models/UserDash')
 const { Op } = require("sequelize");
 const jwt = require('jsonwebtoken')
 const emailController = require('../controllers/emailController')
-const md5 = require('md5')
+// const md5 = require('md5')
 const crypt = require("unix-crypt-td-js");
-const { json } = require('body-parser');
+// const { json } = require('body-parser');
+const moment = require('moment');
 
 module.exports = {
     login: async (req, res) => {
@@ -86,10 +87,10 @@ module.exports = {
                 return res.json({ error: '', token, user })
 
             }
-            return res.json({ error: 'Usuário nao cadastrado' })
+            return res.json({ error: 'Usuário não cadastrado ou bloqueado!' })
 
         } catch (e) {
-            res.json({ error: "Impossivel logar! Verifique os dados ou tente novamente mais tarte!" + e })
+            res.json({ error: "Impossivel logar! Verifique os dados e tente novamente mais tarde!" + e })
         }
     },
     signup: async (req, res) => {
@@ -115,8 +116,8 @@ module.exports = {
                     })
 
                     if (ver_matricula) {
-                        let secret = md5(req.body.matricula + ver_matricula.cd_empresa)
-                        emailController.send_email(req.body.email, secret)
+                        // let secret = md5(req.body.matricula + ver_matricula.cd_empresa)
+                        // emailController.send_email(req.body.email, secret)
                         let loja = await Loja.findOne({
                             where: {
                                 sg_loja: ver_matricula.cd_empresa
@@ -128,13 +129,13 @@ module.exports = {
                             cd_empresa: ver_matricula.cd_empresa,
                             email: req.body.email,
                             valido: 3,
-                            hash: secret,
+                            // hash: secret,
                             nr_pis: ver_matricula.nr_pis,
                             cnpj: loja.nr_cgc,
                             no_funcao: ver_matricula.no_funcao
                         })
 
-                        return res.json({ error: '', success: 'Enviamos uma confirmação para o e-mail!' })
+                        return res.json({ error: '', success: 'Bem-vindo! aguarde o administrador liberar o seu acesso.' })
 
                     }
                     return res.json({ error: 'Matricula não encontrada' })
@@ -220,17 +221,40 @@ module.exports = {
         try {
             let matriculas = req.body.matriculas
             let coordenadas = req.body.coordenadas
-            
+
             let user = await Models.User.findAll({
                 where: {
                     matricula: {
-                        [Op.in]:matriculas
+                        [Op.in]: matriculas
                     }
                 }
             })
-            user.map(a=>a.local_permitido = coordenadas)
+            user.map(a => a.local_permitido = coordenadas)
             await user.map(a => a.save())
-            return res.json({success:'Localização salva'})
+            return res.json({ success: 'Localização salva' })
+
+        } catch (e) {
+            return res.json({ error: "Erro " + e })
+        }
+    },
+    get_location: async (req, res, next) => {
+        try {
+            let matriculas = req.body.matriculas
+
+            if (matriculas == '')
+                return
+
+            let user = await Models.User.findAll({
+                where: {
+                    matricula: {
+                        [Op.in]: matriculas
+                    }
+                }
+            })
+            if (user != '') {
+                return res.json({ error: '', user: user[0].local_permitido })
+            }
+            return res.json({ error: 'Usuário não encontrado' })
 
         } catch (e) {
             return res.json({ error: "Erro " + e })
@@ -239,20 +263,24 @@ module.exports = {
     bloquear: async (req, res, next) => {
         try {
             let matriculas = req.body.matriculas
-            
+
             let user = await Models.User.findAll({
                 where: {
                     matricula: {
-                        [Op.in]:matriculas
+                        [Op.in]: matriculas
                     }
                 }
             })
             if (user.length < matriculas.length) {
-                return res.json({error:'Usuário inativo selecionado'})
+                return res.json({ error: 'Usuário inativo selecionado' })
             }
-            user.map(a=>a.valido = 2)
+            user.map(a => {
+                a.valido = 2
+                a.init_date = null
+                a.end_date = null
+            })
             await user.map(a => a.save())
-            return res.json({success:'Bloqueado com sucesso'})
+            return res.json({ success: 'Bloqueado com sucesso' })
 
         } catch (e) {
             return res.json({ error: "Erro " + e })
@@ -260,21 +288,27 @@ module.exports = {
     },
     liberar: async (req, res, next) => {
         try {
+            let initDate = moment(req.body.dates[0]).format('YYYY-MM-DD')
+            let endDate = moment(req.body.dates[1]).format('YYYY-MM-DD')
             let matriculas = req.body.matriculas
-            
+
             let user = await Models.User.findAll({
                 where: {
                     matricula: {
-                        [Op.in]:matriculas
+                        [Op.in]: matriculas
                     }
                 }
             })
             if (user.length < matriculas.length) {
-                return res.json({error:'Usuário inativo selecionado'})
+                return res.json({ error: 'Usuário inativo selecionado' })
             }
-            user.map(a=>a.valido = 1)
+            user.map(a => {
+                a.valido = 1
+                a.init_date = initDate
+                a.end_date = endDate
+            })
             await user.map(a => a.save())
-            return res.json({success:'Liberado com sucesso'})
+            return res.json({ success: 'Liberado com sucesso' })
 
         } catch (e) {
             return res.json({ error: "Erro " + e })
