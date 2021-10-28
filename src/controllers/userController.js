@@ -25,7 +25,7 @@ module.exports = {
             if (!user_res) {
                 return res.json({ error: "Usuário não cadastrado" })
             }
-            const { no_usuariored: nome, cd_idreg, cd_matricula, cd_setor } = user_res;
+            const { no_usuariored: nome, cd_idreg, cd_matricula } = user_res;
 
             const classes = await ClassesUser.findAll({
                 where: {
@@ -45,7 +45,7 @@ module.exports = {
             const classes_user = classes.map(a => a.cd_classe);
             const lojas_user = lojas.map(a => a.sg_loja)
 
-            let user = { nome: nome.trim(), cd_idreg, no_setor: setor.no_setor.trim(), matricula: cd_matricula, cd_setor: setor.cd_setor };
+            let user = { nome: nome.trim(), cd_idreg, no_setor: setor.no_setor.trim(), matricula: cd_matricula, cd_setor: setor.cd_setor, cd_empresa: setor.cd_empresa };
 
             const token = jwt.sign({ nome, cd_idreg, lojas: lojas_user, classes: classes_user }, process.env.JWT_KEY, { expiresIn: "1h" });
 
@@ -187,25 +187,14 @@ module.exports = {
         try {
 
             let cd_setor = req.body.setor
-            let ress = await Models.Funcionario.findAll({
-                where: {
-                    [Op.and]: [{ cd_setor }, { dt_demissao: null }]
-                }
-            })
-
-            let matriculas = ress.map(a => a.matricula)
-
+            let cd_empresa = req.body.empresa
+        
             let res_funci = await Models.Funcionario.findAll({
                 where: {
-                    [Op.and]: [{ cd_setor }, { dt_demissao: null }]
+                    [Op.and]: [{cd_empresa},{ cd_setor }, { dt_demissao: null }]
                 },
                 include: [{
                     model: Models.User,
-                    // where:{
-                    //     matricula: {
-                    //         [Op.in]:matriculas
-                    //     }
-                    // }
                 }]
             })
             if (res_funci.length > 0) {
