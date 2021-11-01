@@ -4,7 +4,7 @@ const { UserDash, ClassesUser, LojasUser } = require('../models/UserDash')
 const { Op } = require("sequelize");
 const jwt = require('jsonwebtoken')
 const emailController = require('../controllers/emailController')
-// const md5 = require('md5')
+const md5 = require('md5')
 const crypt = require("unix-crypt-td-js");
 // const { json } = require('body-parser');
 const moment = require('moment');
@@ -57,18 +57,10 @@ module.exports = {
     },
     signin: async (req, res) => {
         try {
-            let verify = await Models.Funcionario.findOne({
-                where: {
-                    [Op.and]: [{ matricula: req.body.matricula }, { dt_demissao: null }]
-                }
-            })
-            if (!verify) {
-                return res.json({ error: 'Usuário não permitido' })
-            }
-
+            let password = md5(req.body.password)
             let user = await Models.User.findOne({
                 where: {
-                    [Op.and]: [{ matricula: req.body.matricula }, { email: req.body.email }, { valido: 1 }]
+                    [Op.and]: [{ password }, { email: req.body.email }, { valido: 1 }]
                 }
             })
             if (user) {
@@ -87,7 +79,7 @@ module.exports = {
                 return res.json({ error: '', token, user })
 
             }
-            return res.json({ error: 'Usuário não cadastrado ou bloqueado!' })
+            return res.json({ error: 'Usuário não cadastrado ou bloqueado/pendente!' })
 
         } catch (e) {
             res.json({ error: "Impossivel logar! Verifique os dados e tente novamente mais tarde!" + e })
@@ -95,20 +87,18 @@ module.exports = {
     },
     signup: async (req, res) => {
         try {
+            console.log(req.body)
             emailController.verificar_email(req.body.email, async (error, info) => {
                 if (info.success == true) {
-
                     let verificacao = await Models.User.findOne({
                         where: {
-                            [Op.or]: [{ matricula: req.body.matricula }, { email: req.body.email }]
+                            email: req.body.email
                         }
                     })
 
-                    if (verificacao) {
+                    if (verificacao)
                         return res.json({ error: "Dados já cadastrado" })
-
-                    }
-
+                    
                     let ver_matricula = await Models.Funcionario.findOne({
                         where: {
                             [Op.and]: [{ matricula: req.body.matricula }, { dt_demissao: null }]
@@ -116,7 +106,7 @@ module.exports = {
                     })
 
                     if (ver_matricula) {
-                        // let secret = md5(req.body.matricula + ver_matricula.cd_empresa)
+                        let password = md5(req.body.password)
                         // emailController.send_email(req.body.email, secret)
                         let loja = await Loja.findOne({
                             where: {
@@ -132,7 +122,8 @@ module.exports = {
                             // hash: secret,
                             nr_pis: ver_matricula.nr_pis,
                             cnpj: loja.nr_cgc,
-                            no_funcao: ver_matricula.no_funcao
+                            no_funcao: ver_matricula.no_funcao,
+                            password
                         })
 
                         return res.json({ error: '', success: 'Bem-vindo! aguarde o administrador liberar o seu acesso.' })
@@ -188,10 +179,10 @@ module.exports = {
 
             let cd_setor = req.body.setor
             let cd_empresa = req.body.empresa
-        
+
             let res_funci = await Models.Funcionario.findAll({
                 where: {
-                    [Op.and]: [{cd_empresa},{ cd_setor }, { dt_demissao: null }]
+                    [Op.and]: [{ cd_empresa }, { cd_setor }, { dt_demissao: null }]
                 },
                 include: [{
                     model: Models.User,

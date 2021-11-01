@@ -7,6 +7,9 @@ const User = sequelize.define('funcionario_app', {
         type: DataTypes.INTEGER,
         primaryKey: true
     },
+    password: {
+        type: DataTypes.STRING,
+    },
     nome: {
         type: DataTypes.STRING,
     },
