@@ -12,6 +12,7 @@ router.post('/login', UserController.login);
 
 router.post('/signin', UserController.signin);
 router.post('/signup', UserController.signup);
+router.post('/change_password',Auth.private, UserController.change_password);
 router.post('/add_photo',Auth.private, UserController.add_photo);
 router.post('/take_photo',Auth.private, UserController.take_photo);
 router.post('/salvar_localizacao',Auth.private, UserController.save_location);

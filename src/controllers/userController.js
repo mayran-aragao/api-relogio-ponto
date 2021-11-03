@@ -64,7 +64,6 @@ module.exports = {
                 }
             })
             if (user) {
-
                 const token = jwt.sign({
                     cd_empresa: user.cd_empresa,
                     nome: user.nome,
@@ -77,7 +76,6 @@ module.exports = {
                         expiresIn: "24h"
                     })
                 return res.json({ error: '', token, user })
-
             }
             return res.json({ error: 'Usuário não cadastrado ou bloqueado/pendente!' })
 
@@ -98,7 +96,7 @@ module.exports = {
 
                     if (verificacao)
                         return res.json({ error: "Dados já cadastrado" })
-                    
+
                     let ver_matricula = await Models.Funcionario.findOne({
                         where: {
                             [Op.and]: [{ matricula: req.body.matricula }, { dt_demissao: null }]
@@ -289,6 +287,26 @@ module.exports = {
             })
             await user.map(a => a.save())
             return res.json({ success: 'Liberado com sucesso' })
+
+        } catch (e) {
+            return res.json({ error: "Erro " + e })
+        }
+    },
+    change_password: async (req, res, next) => {
+        try {
+            let password = md5(req.body.currentPassword)
+            let user = await Models.User.findOne({
+                where: {
+                    [Op.and]: [{ matricula: req.body.matricula }, { password }]
+                }
+            })
+            if (user) {
+                let newPassword = md5(req.body.newPassword)
+                user.password = newPassword
+                await user.save()
+                return res.json({ error: '', success: 'Senha alterada com sucesso!' })
+            }
+            return res.json({ error: 'Senha atual errada!', })
 
         } catch (e) {
             return res.json({ error: "Erro " + e })
