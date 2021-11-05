@@ -85,54 +85,55 @@ module.exports = {
     },
     signup: async (req, res) => {
         try {
-            console.log(req.body)
-            emailController.verificar_email(req.body.email, async (error, info) => {
-                if (info.success == true) {
-                    let verificacao = await Models.User.findOne({
-                        where: {
-                            email: req.body.email
-                        }
-                    })
-
-                    if (verificacao)
-                        return res.json({ error: "Dados já cadastrado" })
-
-                    let ver_matricula = await Models.Funcionario.findOne({
-                        where: {
-                            [Op.and]: [{ matricula: req.body.matricula }, { dt_demissao: null }]
-                        }
-                    })
-
-                    if (ver_matricula) {
-                        let password = md5(req.body.password)
-                        // emailController.send_email(req.body.email, secret)
-                        let loja = await Loja.findOne({
-                            where: {
-                                sg_loja: ver_matricula.cd_empresa
-                            }
-                        })
-                        let user = await Models.User.create({
-                            nome: (ver_matricula.nome).trim(),
-                            matricula: req.body.matricula,
-                            cd_empresa: ver_matricula.cd_empresa,
-                            email: req.body.email,
-                            valido: 3,
-                            // hash: secret,
-                            nr_pis: ver_matricula.nr_pis,
-                            cnpj: loja.nr_cgc,
-                            no_funcao: ver_matricula.no_funcao,
-                            password
-                        })
-
-                        return res.json({ error: '', success: 'Bem-vindo! aguarde o administrador liberar o seu acesso.' })
-
+            // emailController.verificar_email(req.body.email, async (error, info) => {
+            let regex =/^[a-z0-9.]+@armazemparaiba.com.br$/
+            const verify = regex.test(req.body.email)
+            if (verify == true) {
+                let verificacao = await Models.User.findOne({
+                    where: {
+                        [Op.or]: [{ matricula: req.body.matricula }, { email: req.body.email }]
                     }
-                    return res.json({ error: 'Matricula não encontrada' })
+                })
+
+                if (verificacao)
+                    return res.json({ error: "Dados já cadastrado" })
+
+                let ver_matricula = await Models.Funcionario.findOne({
+                    where: {
+                        [Op.and]: [{ matricula: req.body.matricula }, { dt_demissao: null }]
+                    }
+                })
+
+                if (ver_matricula) {
+                    let password = md5(req.body.password)
+                    // emailController.send_email(req.body.email, secret)
+                    let loja = await Loja.findOne({
+                        where: {
+                            sg_loja: ver_matricula.cd_empresa
+                        }
+                    })
+                    let user = await Models.User.create({
+                        nome: (ver_matricula.nome).trim(),
+                        matricula: req.body.matricula,
+                        cd_empresa: ver_matricula.cd_empresa,
+                        email: req.body.email,
+                        valido: 3,
+                        // hash: secret,
+                        nr_pis: ver_matricula.nr_pis,
+                        cnpj: loja.nr_cgc,
+                        no_funcao: ver_matricula.no_funcao,
+                        password
+                    })
+
+                    return res.json({ error: '', success: 'Bem-vindo! aguarde o administrador liberar o seu acesso.' })
 
                 }
-                return res.json({ error: 'E-mail invalido' })
+                return res.json({ error: 'Matricula não encontrada' })
 
-            })
+            }
+            return res.json({ error: 'E-mail invalido' })
+
+            // })
 
         } catch (e) {
             return res.json({ error: "Impossivel cadastrar! Verifique os dados ou tente novamente mais tarte! " + e })
