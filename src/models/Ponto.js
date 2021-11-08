@@ -34,6 +34,9 @@ const Ponto = sequelize.define('pontorep', {
     },
     localizacao: {
         type: DataTypes.JSON
+    },
+    autorizante: {
+        type: DataTypes.INTEGER
     }
 
 }, {

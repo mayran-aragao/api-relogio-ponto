@@ -49,6 +49,9 @@ const User = sequelize.define('funcionario_app', {
     end_date: {
         type: DataTypes.DATE
     },
+    autorizante: {
+        type: DataTypes.INTEGER
+    }
 }, {
     timestamps: false,
     tableName: "funcionario_app",

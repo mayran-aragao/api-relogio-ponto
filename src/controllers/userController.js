@@ -257,6 +257,7 @@ module.exports = {
                 a.valido = 2
                 a.init_date = null
                 a.end_date = null
+                a.autorizante = req.body.autorizante
             })
             await user.map(a => a.save())
             return res.json({ success: 'Bloqueado com sucesso' })
@@ -285,6 +286,7 @@ module.exports = {
                 a.valido = 1
                 a.init_date = initDate
                 a.end_date = endDate
+                a.autorizante = req.body.autorizante
             })
             await user.map(a => a.save())
             return res.json({ success: 'Liberado com sucesso' })

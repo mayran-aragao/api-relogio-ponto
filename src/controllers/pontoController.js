@@ -102,7 +102,8 @@ module.exports = {
                     hr_ponto: req.body.hr_ponto,
                     nsr: req.body.nsr,
                     nr_pis: req.body.nr_pis,
-                    localizacao: req.body.location
+                    localizacao: req.body.location,
+                    autorizante:req.body.autorizante
                 })
                 if (ponto)
                     return res.json({ error: '', success: 'Ponto registrado com sucesso', ponto })
