@@ -8,11 +8,26 @@ module.exports = {
         try {
 
             let cd_setor = req.body.setor
-            let res_funci = await Models.Funcionario.findAll({
-                where: {
-                    [Op.and]: [{ cd_setor }, { dt_demissao: null }]
-                }
-            })
+            let cd_empresa = req.body.empresa
+            let classes = req.body.classes.includes('D1')
+            let res_funci = []
+            if (classes) {
+                res_funci = await Models.Funcionario.findAll({
+                    where: {
+                        [Op.and]: [{ cd_empresa }, { dt_demissao: null }],
+                        [Op.not]: { no_setor: 'AFAST.APOSENTADORIA INVALIDEZ' }
+                    }
+                })
+            } else {
+                res_funci = await Models.Funcionario.findAll({
+                    where: {
+                        [Op.and]: [{ cd_setor }, { dt_demissao: null }],
+                        [Op.not]: { no_setor: 'AFAST.APOSENTADORIA INVALIDEZ' }
+                    }
+                })
+            }
+
+            console.log(res_funci)
             let funcionarios = res_funci.map(a => a.matricula)
             let matriculas = funcionarios
             funcionarios = funcionarios.map(a => {
@@ -103,7 +118,7 @@ module.exports = {
                     nsr: req.body.nsr,
                     nr_pis: req.body.nr_pis,
                     localizacao: req.body.location,
-                    autorizante:req.body.autorizante
+                    autorizante: req.body.autorizante
                 })
                 if (ponto)
                     return res.json({ error: '', success: 'Ponto registrado com sucesso', ponto })

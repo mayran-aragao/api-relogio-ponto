@@ -45,7 +45,7 @@ module.exports = {
             const classes_user = classes.map(a => a.cd_classe);
             const lojas_user = lojas.map(a => a.sg_loja)
 
-            let user = { nome: nome.trim(), cd_idreg, no_setor: setor.no_setor.trim(), matricula: cd_matricula, cd_setor: setor.cd_setor, cd_empresa: setor.cd_empresa };
+            let user = { nome: nome.trim(), cd_idreg, no_setor: setor.no_setor.trim(), matricula: cd_matricula, cd_setor: setor.cd_setor, cd_empresa: setor.cd_empresa, classes: classes_user };
 
             const token = jwt.sign({ nome, cd_idreg, lojas: lojas_user, classes: classes_user }, process.env.JWT_KEY, { expiresIn: "1h" });
 
@@ -175,18 +175,32 @@ module.exports = {
     },
     buscar_funcionarios: async (req, res, next) => {
         try {
-
             let cd_setor = req.body.setor
             let cd_empresa = req.body.empresa
-
-            let res_funci = await Models.Funcionario.findAll({
-                where: {
-                    [Op.and]: [{ cd_empresa }, { cd_setor }, { dt_demissao: null }]
-                },
-                include: [{
-                    model: Models.User,
-                }]
-            })
+            let classes = req.body.classes.includes('D1')
+            let res_funci = []
+            if (classes) {
+                res_funci = await Models.Funcionario.findAll({
+                    where: {
+                        [Op.and]: [{ cd_empresa }, { dt_demissao: null }],
+                        [Op.not]: { no_setor: 'AFAST.APOSENTADORIA INVALIDEZ' }
+                    },
+                    include: [{
+                        model: Models.User,
+                    }]
+                })
+            }else {
+                res_funci = await Models.Funcionario.findAll({
+                    where: {
+                        [Op.and]: [{ cd_empresa }, { cd_setor }, { dt_demissao: null }],
+                        [Op.not]: { no_setor: 'AFAST.APOSENTADORIA INVALIDEZ' }
+                    },
+                    include: [{
+                        model: Models.User,
+                    }]
+                })
+            }
+            
             if (res_funci.length > 0) {
                 return res.json(res_funci)
             }
