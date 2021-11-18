@@ -4,7 +4,7 @@ const router = express.Router()
 
 const UserController = require('../controllers/userController')
 const PontoController = require('../controllers/pontoController')
-const ConfirmacaoController = require('../controllers/confirmacaoController')
+// const ConfirmacaoController = require('../controllers/confirmacaoController')
 const AuthController =  require ('../controllers/authController')
 const Auth = require('../middleware/Auth')
 
@@ -29,7 +29,7 @@ router.post('/buscar_nsr', Auth.private, PontoController.buscar_nsr)
 
 router.post('/salvar_ponto', Auth.private, PontoController.salvar_ponto)
 
-router.get('/auth/:hash',ConfirmacaoController.home)
+// router.get('/auth/:hash',ConfirmacaoController.home)
 
 
 
